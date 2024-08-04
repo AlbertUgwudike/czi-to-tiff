@@ -1,11 +1,6 @@
-package org.example
-
-
-import FileConvert
 import kotlinx.coroutines.*
 import loci.common.DebugTools
 import java.nio.file.Path
-import kotlin.coroutines.CoroutineContext
 import kotlin.io.path.Path
 import kotlin.io.path.listDirectoryEntries
 
@@ -37,24 +32,21 @@ fun main() {
 
     runBlocking {
         coroutineScope {
-            val ress = mutableListOf<Deferred<Unit>>()
             for (batchIdx in 0 until 7) {
-                val res = async {
+                launch {
                     println("Attempting")
                     delay(3000)
                     val start = batchIdx * 6
-                    for (fileIdx in start until start + 7) {
+                    for (fileIdx in start until start + 6) {
                         process(fileNames[fileIdx])
                     }
                 }
-                ress.add(res)
             }
-            ress.forEach { it.await() }
         }
     }
 }
 
-suspend fun process(f: Path) {
+fun process(f: Path) {
     val srcFile = f.toString()
     println(srcFile)
     val destFile = srcFile.dropLast(4) + ".ome.tiff"
