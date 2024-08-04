@@ -15,6 +15,7 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation(group = "ome", name = "formats-gpl", version = "7.3.0")
     implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.3.14")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 }
 
 tasks.test {
