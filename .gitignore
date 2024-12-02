@@ -40,3 +40,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Images ###
+test.lof
+test_out.tiff
