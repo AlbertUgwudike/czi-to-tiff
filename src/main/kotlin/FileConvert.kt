@@ -5,8 +5,12 @@ import loci.formats.FormatException
 import loci.formats.FormatTools
 import loci.formats.ImageReader
 import loci.formats.ImageWriter
+import loci.formats.`in`.LOFReader
 import loci.formats.meta.IMetadata
+import loci.formats.out.OMETiffWriter
+import loci.formats.out.TiffWriter
 import loci.formats.services.OMEXMLService
+import loci.formats.tiff.TiffSaver
 import java.io.IOException
 
 /**
@@ -31,7 +35,7 @@ class FileConvert
     private var reader: ImageReader? = null
 
     /** The file format writer.  */
-    private var writer: ImageWriter? = null
+    private var writer: TiffWriter? = null
 
     /** Do the actual work of converting the input file to the output file.  */
     fun convert() {
@@ -70,8 +74,12 @@ class FileConvert
             reader!!.setId(inputFile)
 
             // set up the writer and associate it with the output file
-            writer = ImageWriter()
+            //writer = ImageWriter()
+            writer = TiffWriter();
+            writer!!.setBigTiff(true)
             writer!!.metadataRetrieve = omexml
+            // writer!!.isInterleaved = reader!!.isInterleaved
+            // writer!!.setWriteSequentially(true)
             writer!!.isInterleaved = reader!!.isInterleaved
             writer!!.setId(outputFile)
         } catch (e: FormatException) {
@@ -106,13 +114,47 @@ class FileConvert
             }
 
             // construct a buffer to hold one image's pixels
-            val plane = ByteArray(FormatTools.getPlaneSize(reader))
+            println("#######################################################")
+            println(reader!!.imageCount)
+            println(reader!!.bitsPerPixel)
+            println(reader!!.sizeC)
+            println(reader!!.sizeT)
+            println(reader!!.sizeX)
+            println(reader!!.sizeY)
+            println(reader!!.sizeZ)
+            println(reader!!.rgbChannelCount)
+            println("GetPlaneSz ${FormatTools.getPlaneSize(reader)}")
+            val sz = reader!!.sizeX * reader!!.sizeY * (reader!!.bitsPerPixel / 8)
+            val buf_size = reader!!.sizeX * (reader!!.bitsPerPixel / 8) * 3;
+            println("calculated: $sz")
+            println("Max ${Int.MAX_VALUE}")
+            println("ImageCount ${reader!!.imageCount}")
+            println("#######################################################")
+
+            // val plane = ByteArray(FormatTools.getPlaneSize(reader))
+            val plane = ByteArray(buf_size * 100)
 
             // convert each image in the current series
             for (image in 0 until reader!!.imageCount) {
+                val nChunks: Int = reader!!.sizeY / 100;
                 try {
-                    reader!!.openBytes(image, plane)
-                    writer!!.saveBytes(image, plane)
+                    for (i in 0 until nChunks) {
+                        val x = 0
+                        val y = i * 100;
+                        val w = buf_size / 6;
+                        val h = 100
+                        reader!!.openBytes(image, plane, x, y, w, h)
+                        writer!!.saveBytes(image, plane, x ,y, w, h)
+                    }
+
+                    val x = 0
+                    val y = nChunks * 100;
+                    val w = buf_size / 6;
+                    val h = reader!!.sizeY % 100;
+                    val lastPlane = ByteArray(buf_size * h)
+                    reader!!.openBytes(image, lastPlane, x, y, w, h)
+                    writer!!.saveBytes(image, lastPlane, x ,y, w, h)
+
                 } catch (e: IOException) {
                     System.err.println(
                         "Failed to convert image #" + image +
