@@ -1,5 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.9.23"
+    // kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "2.1.0"
 }
 
 group = "org.example"
@@ -21,3 +22,28 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
 }
+
+val fatJar = task("fatJar", type = Jar::class) {
+    manifest {
+        attributes["Implementation-Title"] = "Gradle Jar File Example"
+        attributes["Implementation-Version"] = version
+        attributes["Main-Class"] = "MainKt"
+    }
+    from(configurations.compileClasspath.get().map({ if (it.isDirectory) it else zipTree(it) }))
+    with(tasks.jar.get() as CopySpec)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks {
+    "build" {
+        dependsOn(fatJar)
+    }
+}
+
+
+//tasks.jar {
+//    manifest {
+//        attributes(hashMapOf("Main-Class" to "MainKt"))
+//    }
+//    from { configurations.runtimeClasspath.
+//}

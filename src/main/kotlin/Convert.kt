@@ -6,7 +6,7 @@ import kotlin.math.pow
 
 
 
-fun lof2tiff(inputFilename: String, outputFilename: String) {
+fun lof2tiff_(inputFilename: String, outputFilename: String) {
     val inputStream = RandomAccessInputStream(inputFilename)
     val outputStream = RandomAccessOutputStream(outputFilename)
 
@@ -94,12 +94,18 @@ fun testFile(inputFilename: String) {
 
 }
 
-fun main() {
-    val inputFilename = "/Volumes/Undergrad/Vanessa Drevenakova/MICA/1MPa/parameter testing Ib1CD68_1MPa_19_07_2024/2024_07_18_10_18_45--Parameter testing Iba1CD68 1Mpa 24_6_12_2/Sequence 001/24_6_12_2.1.lof"
-    val outputFilename = "/Users/vaness/projects/czi-to-tiff/test.tiff"
-    // val inputFilename = "/Users/vaness/projects/czi-to-tiff/test.lof"
+fun lof2tiff(inputFilename: String, outputFilename: String) {
+    FileConvert(inputFilename, outputFilename).convert()
+}
 
-    lof2tiff(inputFilename, outputFilename)
+fun main() {
+    // val inputFilename = "/Volumes/Undergrad/Vanessa Drevenakova/MICA/1MPa/parameter testing Ib1CD68_1MPa_19_07_2024/2024_07_18_10_18_45--Parameter testing Iba1CD68 1Mpa 24_6_12_2/Sequence 001/24_6_12_2.1.lof"
+    val outputFilename = "/Users/albert/projects/lof-to-tiff/test.tiff"
+    val inputFilename = "/Users/albert/projects/lof-to-tiff/test.lof"
+
+    // lof2tiff(inputFilename, outputFilename)
+
+    FileConvert(inputFilename, outputFilename).convert()
 
 //    val validFilename = "/Users/vaness/projects/czi-to-tiff/valid.tiff"
 //
