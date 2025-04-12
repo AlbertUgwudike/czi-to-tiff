@@ -54,10 +54,18 @@ fun process(f: Path) {
     println("${f.fileName} Complete!")
 }
 
+
 fun main(args: Array<String>) {
     try {
         FileConvert(args[0], args[1]).convert()
     } catch (e: Exception) {
         println(e.toString())
     }
+}
+
+fun maain() {
+    val other_file = "/Volumes/Undergrad/Vanessa Drevenakova/DAB/Vanessa Drevenakova/2024_06_07_13_34_00--Parameter testing DAB Iba1 - 24_3_21-6/Sequence 001/24_3_21-6.3.lof";
+    val other_other_file = "/Volumes/Undergrad/Vanessa Drevenakova/DAB/Vanessa Drevenakova/2024_06_07_14_20_50--Parameter testing DAB Iba1 - 24_5_16-1/Sequence 001/24_5-16-1.2.lof"
+    val inputFn = "/Volumes/Undergrad/Vanessa Drevenakova/MICA/0.4MPa/Iba1 CD68/2024_06_08_14_48_56--Parameter testing Iba1CD68 24_3_21-7/Sequence 001/24_3_21-7.1.lof";
+    process(Path(inputFn));
 }

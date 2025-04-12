@@ -1,5 +1,7 @@
 import loci.common.RandomAccessInputStream
 import loci.common.RandomAccessOutputStream
+import loci.formats.`in`.LOFReader
+import loci.formats.`in`.TiffReader
 
 
 fun writeTiffStream(

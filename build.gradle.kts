@@ -23,7 +23,7 @@ tasks.test {
     useJUnitPlatform()
 }
 
-val fatJar = task("fatJar", type = Jar::class) {
+val fatJar = task("fatJarr", type = Jar::class) {
     manifest {
         attributes["Implementation-Title"] = "Gradle Jar File Example"
         attributes["Implementation-Version"] = version
