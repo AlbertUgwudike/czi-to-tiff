@@ -71,7 +71,7 @@ class FileConvert
 
             // set up the writer and associate it with the output file
             //writer = ImageWriter()
-            writer = TiffWriter();
+            writer = TiffWriter()
             writer!!.setBigTiff(true)
             writer!!.metadataRetrieve = omexml
             writer!!.isInterleaved = reader!!.isInterleaved
@@ -92,7 +92,7 @@ class FileConvert
         return exception == null
     }
 
-    private fun convertPlanesSingleRGB(series: Int) {
+    private fun convertPlanesSingleRGB(series: Int, channelsPerSeries: Int) {
         reader!!.series = series
         try {
             writer!!.series = series
@@ -101,64 +101,34 @@ class FileConvert
             e.printStackTrace()
             return
         }
+        val byteDepth = reader!!.bitsPerPixel / 8
+        val bytesPerPixel = byteDepth * channelsPerSeries
+        val bufSize = reader!!.sizeX * bytesPerPixel
 
-        val buf_size = reader!!.sizeX * (reader!!.bitsPerPixel / 8) * 3;
 
         // val plane = ByteArray(FormatTools.getPlaneSize(reader))
-        val chonkSize = 1000;
-        val plane = ByteArray(buf_size * chonkSize)
+        val chonkSize = 1000
+        val plane = ByteArray(bufSize * chonkSize)
 
         for (image in 0 until reader!!.imageCount) {
-            val nChunks: Int = reader!!.sizeY / chonkSize;
+            val nChunks: Int = reader!!.sizeY / chonkSize
             try {
                 for (i in 0 until nChunks) {
                     val x = 0
-                    val y = i * chonkSize;
-                    val w = buf_size / 6; //six bytes per pixel                                                         ]
+                    val y = i * chonkSize
+                    val w = reader!!.sizeX
                     reader!!.openBytes(image, plane, x, y, w, chonkSize)
                     writer!!.saveBytes(image, plane, x, y, w, chonkSize)
                 }
 
                 val x = 0
-                val y = nChunks * chonkSize;
-                val w = buf_size / 6;
-                val h = reader!!.sizeY % chonkSize;
-                val lastPlane = ByteArray(buf_size * h)
+                val y = nChunks * chonkSize
+                val w = reader!!.sizeX
+                val h = reader!!.sizeY % chonkSize
+                val lastPlane = ByteArray(bufSize * h)
                 reader!!.openBytes(image, lastPlane, x, y, w, h)
                 writer!!.saveBytes(image, lastPlane, x ,y, w, h)
 
-            } catch (e: IOException) {
-                System.err.println(
-                    "Failed to convert image #" + image +
-                            " in series #" + series
-                )
-                e.printStackTrace()
-            } catch (e: FormatException) {
-                System.err.println(
-                    ("Failed to convert image #" + image +
-                            " in series #" + series)
-                )
-                e.printStackTrace()
-            }
-        }
-    }
-
-    private fun convertPlanesTripleGray(series: Int) {
-        reader!!.series = series
-        try {
-            writer!!.series = series
-        } catch (e: FormatException) {
-            System.err.println("Failed to set writer's series #$series")
-            e.printStackTrace()
-            return
-        }
-
-        val plane = ByteArray(FormatTools.getPlaneSize(reader))
-
-        for (image in 0 until reader!!.imageCount) {
-            try {
-                reader!!.openBytes(image, plane)
-                writer!!.saveBytes(image, plane)
             } catch (e: IOException) {
                 System.err.println(
                     "Failed to convert image #" + image +
@@ -180,26 +150,24 @@ class FileConvert
         for (series in 0 until reader!!.seriesCount) {
             // construct a buffer to hold one image's pixels
             println("#######################################################")
-            println(reader!!.imageCount)
-            println(reader!!.bitsPerPixel)
-            println(reader!!.sizeC)
-            println(reader!!.sizeT)
-            println(reader!!.sizeX)
-            println(reader!!.sizeY)
-            println(reader!!.sizeZ)
-            println(reader!!.rgbChannelCount)
+            println("bpp ${reader!!.bitsPerPixel}")
+            println("C ${reader!!.sizeC}")
+            println("T ${reader!!.sizeT}")
+            println("X ${reader!!.sizeX}")
+            println("Y ${reader!!.sizeY}")
+            println("Z ${reader!!.sizeZ}")
+            println("rgb ${reader!!.rgbChannelCount}")
             println("GetPlaneSz ${FormatTools.getPlaneSize(reader)}")
             val sz = reader!!.sizeX * reader!!.sizeY * (reader!!.bitsPerPixel / 8)
-            val buf_size = reader!!.sizeX * (reader!!.bitsPerPixel / 8) * 3;
             println("calculated: $sz")
             println("Max ${Int.MAX_VALUE}")
             println("ImageCount ${reader!!.imageCount}")
             println("#######################################################")
-
+//            throw NullPointerException()
             if (reader!!.imageCount == 1) {
-                convertPlanesSingleRGB(series)
+                convertPlanesSingleRGB(series, 3)
             } else {
-                convertPlanesTripleGray(series)
+                convertPlanesSingleRGB(series, 1)
             }
         }
     }
