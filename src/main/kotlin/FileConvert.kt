@@ -92,7 +92,7 @@ class FileConvert
         return exception == null
     }
 
-    private fun convertPlanesSingleRGB(series: Int, channelsPerSeries: Int) {
+    private fun convertPlanesSingleRGB(series: Int) {
         reader!!.series = series
         try {
             writer!!.series = series
@@ -101,10 +101,11 @@ class FileConvert
             e.printStackTrace()
             return
         }
+
+        val channelsPerSeries = reader!!.sizeC;
         val byteDepth = reader!!.bitsPerPixel / 8
         val bytesPerPixel = byteDepth * channelsPerSeries
         val bufSize = reader!!.sizeX * bytesPerPixel
-
 
         // val plane = ByteArray(FormatTools.getPlaneSize(reader))
         val chonkSize = 1000
@@ -163,12 +164,13 @@ class FileConvert
             println("Max ${Int.MAX_VALUE}")
             println("ImageCount ${reader!!.imageCount}")
             println("#######################################################")
+            convertPlanesSingleRGB(series);
 //            throw NullPointerException()
-            if (reader!!.imageCount == 1) {
-                convertPlanesSingleRGB(series, 3)
-            } else {
-                convertPlanesSingleRGB(series, 1)
-            }
+//            if (reader!!.imageCount == 1) {
+//                convertPlanesSingleRGB(series, 3)
+//            } else {
+//                convertPlanesSingleRGB(series, 1)
+//            }
         }
     }
 
