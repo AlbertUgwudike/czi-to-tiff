@@ -102,7 +102,7 @@ class FileConvert
             return
         }
 
-        val channelsPerSeries = reader!!.sizeC;
+        val channelsPerSeries = reader!!.rgbChannelCount; // <--- -Supe duper annoying
         val byteDepth = reader!!.bitsPerPixel / 8
         val bytesPerPixel = byteDepth * channelsPerSeries
         val bufSize = reader!!.sizeX * bytesPerPixel
